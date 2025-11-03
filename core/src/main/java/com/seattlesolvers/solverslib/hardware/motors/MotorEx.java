@@ -63,7 +63,7 @@ public class MotorEx extends Motor {
             double velocity = veloController.calculate(getCorrectedVelocity(), speed) + feedforward.calculate(speed, getAcceleration());
             setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
         } else if (runmode == RunMode.PositionControl) {
-            double error = positionController.calculate(encoder.getDistance());
+            double error = positionController.calculate(encoder.getPosition());
             setPower(output * error);
         } else {
             setPower(output);
@@ -128,6 +128,7 @@ public class MotorEx extends Motor {
      */
     private void setPower(double power) {
         if ((Math.abs(power - motorEx.getPower()) > cachingTolerance) || (power == 0 && motorEx.getPower() != 0)) {
+            lastPower = power;
             motorEx.setPower(power);
         }
     }
@@ -155,8 +156,10 @@ public class MotorEx extends Motor {
      * @param current the current alert to set
      * @param unit the unit to set the current alert in
      */
-    public void setCurrentAlert(double current, CurrentUnit unit) {
+    public MotorEx setCurrentAlert(double current, CurrentUnit unit) {
         motorEx.setCurrentAlert(current, unit);
+
+        return this;
     }
 
     /**

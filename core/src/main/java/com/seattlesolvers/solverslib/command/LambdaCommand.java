@@ -69,28 +69,22 @@ public class LambdaCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        if (m_initialize != null) {
-            m_initialize.run();
-        }
+        m_initialize.run();
     }
 
     @Override
     public void execute() {
-        if (m_execute != null) {
-            m_execute.run();
-        }
+        m_execute.run();
     }
 
     @Override
     public boolean isFinished() {
-        return m_isFinished != null && m_isFinished.getAsBoolean();
+        return m_isFinished.getAsBoolean();
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (m_end != null) {
-            m_end.accept(interrupted);
-        }
+        m_end.accept(interrupted);
     }
 
     @Override
@@ -190,7 +184,7 @@ public class LambdaCommand extends CommandBase {
     }
 
     /**
-     * Whether the given command should run when the robot is disabled.  Override to return true
+     * Whether the given command should run when the robot is disabled. Override to return true
      * if the command should run when disabled.
      *
      * @param runWhenDisabled runWhenDisabled boolean to set

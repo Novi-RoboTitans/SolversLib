@@ -14,18 +14,22 @@ public class LambdaCommand extends CommandBase {
     protected Runnable m_execute = () -> {};
     protected BooleanSupplier m_isFinished = () -> true;
     protected Consumer<Boolean> m_end = interrupted -> {};
-    protected boolean m_runWhenDisabled = false;
+    protected BooleanSupplier m_runWhenDisabled = () -> false;
 
-    /** Default constructor with empty actions and finishing immediately. */
+    /**
+     * Default constructor for builder
+     */
     public LambdaCommand() {}
 
-    /** Constructor with all actions specified. */
+    /**
+     * Constructor with everything specified
+     */
     public LambdaCommand(Runnable initialize,
                          Runnable execute,
                          BooleanSupplier isFinished,
                          Consumer<Boolean> end,
                          String name,
-                         boolean runWhenDisabled) {
+                         BooleanSupplier runWhenDisabled) {
         this.m_initialize = initialize;
         this.m_execute = execute;
         this.m_isFinished = isFinished;
@@ -34,22 +38,6 @@ public class LambdaCommand extends CommandBase {
         this.m_runWhenDisabled = runWhenDisabled;
     }
 
-    /** Constructor with all actions specified. */
-    public LambdaCommand(Runnable initialize,
-                         Runnable execute,
-                         BooleanSupplier isFinished,
-                         Runnable end,
-                         String name,
-                         boolean runWhenDisabled) {
-        this.m_initialize = initialize;
-        this.m_execute = execute;
-        this.m_isFinished = isFinished;
-        this.m_end = interrupted -> end.run();
-        this.m_name = name;
-        this.m_runWhenDisabled = runWhenDisabled;
-    }
-
-    /** Called once when the command is scheduled. */
     @Override
     public void initialize() {
         if (m_initialize != null) {
@@ -57,7 +45,6 @@ public class LambdaCommand extends CommandBase {
         }
     }
 
-    /** Called repeatedly until finished. */
     @Override
     public void execute() {
         if (m_execute != null) {
@@ -65,13 +52,11 @@ public class LambdaCommand extends CommandBase {
         }
     }
 
-    /** Returns true if the command has finished. */
     @Override
     public boolean isFinished() {
         return m_isFinished != null && m_isFinished.getAsBoolean();
     }
 
-    /** Called once after finishing or when interrupted. */
     @Override
     public void end(boolean interrupted) {
         if (m_end != null) {
@@ -81,7 +66,7 @@ public class LambdaCommand extends CommandBase {
 
     @Override
     public boolean runsWhenDisabled() {
-        return m_runWhenDisabled;
+        return m_runWhenDisabled.getAsBoolean();
     }
 
     // Override to return self type
@@ -98,38 +83,84 @@ public class LambdaCommand extends CommandBase {
         return this;
     }
 
+    /**
+     * The initial subroutine of a command.  Called once when the command is initially scheduled.
+     * @param initialize initialize method to set
+     * @return this object for chaining purposes
+     */
     public LambdaCommand setInitialize(Runnable initialize) {
         this.m_initialize = initialize;
         return this;
     }
 
+    /**
+     * The main body of a command.  Called repeatedly while the command is scheduled.
+     * @param execute execute method to set
+     * @return this object for chaining purposes
+     */
     public LambdaCommand setExecute(Runnable execute) {
         this.m_execute = execute;
         return this;
     }
 
+    /**
+     * Whether the command has finished.  Once a command finishes, the scheduler will call its
+     * end() method and un-schedule it.
+     * @param isFinished isFinished method to set
+     * @return this object for chaining purposes
+     */
     public LambdaCommand setIsFinished(BooleanSupplier isFinished) {
         this.m_isFinished = isFinished;
         return this;
     }
 
+    /**
+     * The action to take when the command ends.  Called when either the command finishes normally,
+     * or when it interrupted/canceled.
+     * @param end end method to set. Should have interrupted (whether the command was
+     *            interrupted/canceled) as the parameter.
+     * @return this object for chaining purposes
+     */
     public LambdaCommand setEnd(Consumer<Boolean> end) {
         this.m_end = end;
         return this;
     }
 
+    /**
+     * The action to take when the command ends.  Called when either the command finishes normally,
+     * or when it interrupted/canceled.
+     * @param end end method to set. Ignores if command was interrupted
+     * @return this object for chaining purposes
+     */
     public LambdaCommand setEnd(Runnable end) {
-        this.m_end = interrupted -> end.run();
-        return this;
+        return setEnd(interrupted -> end.run());
     }
 
-    /** Allows setting whether this command runs when the robot is disabled. */
-    public LambdaCommand setRunWhenDisabled(boolean runWhenDisabled) {
+    /**
+     * Whether the given command should run when the robot is disabled.  Override to return true
+     * if the command should run when disabled.
+     * @param runWhenDisabled runWhenDisabled supplier to set
+     * @return this object for chaining purposes
+     */
+    public LambdaCommand setRunWhenDisabled(BooleanSupplier runWhenDisabled) {
         this.m_runWhenDisabled = runWhenDisabled;
         return this;
     }
 
-    /** Factory method to create a LambdaCommand from a CommandBase. */
+    /**
+     * Whether the given command should run when the robot is disabled.  Override to return true
+     * if the command should run when disabled.
+     * @param runWhenDisabled runWhenDisabled boolean to set
+     * @return this object for chaining purposes
+     */
+    public LambdaCommand setRunWhenDisabled(boolean runWhenDisabled) {
+        return setRunWhenDisabled(() -> runWhenDisabled);
+    }
+
+    /**
+     * Factory method to create a LambdaCommand from a CommandBase.
+     * @return a new LambdaCommand instance
+     */
     public static LambdaCommand from(CommandBase command) {
         return new LambdaCommand(
                 command::initialize,
@@ -137,7 +168,7 @@ public class LambdaCommand extends CommandBase {
                 command::isFinished,
                 command::end,
                 command.getName(),
-                command.runsWhenDisabled()
+                command::runsWhenDisabled
         );
     }
 }

@@ -8,6 +8,35 @@ import java.util.Arrays;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+/**
+ * Command builder without having to create a new class.
+ * Analogous to lambda functions or closures.
+ * <p>
+ * Builder style:
+ * <pre>
+ * CommandBase driveForward = new LambdaCommand()
+ *     .setInitialize(() -> drivetrain.resetEncoders())
+ *     .setExecute(() -> drivetrain.pidTo(new Pose(100, 100))
+ *     .setIsFinished(() -> drivetrain.getDistance() < 5)
+ *     .setEnd(() -> drivetrain.stop()),
+ *     .setName("DriveForward")
+ *     .setRunWhenDisabled(false)
+ * </pre>
+ * Functional style:
+ * <pre>
+ * CommandBase driveForward = new LambdaCommand(
+ *     () -> drivetrain.resetEncoders(),
+ *     () -> drivetrain.pidTo(new Pose(100, 100)),
+ *     () -> drivetrain.getDistance() < 5,
+ *     interrupted -> drivetrain.stop(),
+ *     "DriveForward",
+ *     () -> false
+ * );
+ * </pre>
+ * </p>
+ *
+ * @author Daniel - FTC 7854
+ */
 public class LambdaCommand extends CommandBase {
     // Name, requirements, and subsystem are in CommandBase
     protected Runnable m_initialize = () -> {};
@@ -83,8 +112,16 @@ public class LambdaCommand extends CommandBase {
         return this;
     }
 
+    // Override to return self type
+    @Override
+    public LambdaCommand setSubsystem(String subsystem) {
+        this.m_subsystem = subsystem;
+        return this;
+    }
+
     /**
      * The initial subroutine of a command.  Called once when the command is initially scheduled.
+     *
      * @param initialize initialize method to set
      * @return this object for chaining purposes
      */
@@ -95,6 +132,7 @@ public class LambdaCommand extends CommandBase {
 
     /**
      * The main body of a command.  Called repeatedly while the command is scheduled.
+     *
      * @param execute execute method to set
      * @return this object for chaining purposes
      */
@@ -106,6 +144,7 @@ public class LambdaCommand extends CommandBase {
     /**
      * Whether the command has finished.  Once a command finishes, the scheduler will call its
      * end() method and un-schedule it.
+     *
      * @param isFinished isFinished method to set
      * @return this object for chaining purposes
      */
@@ -117,6 +156,7 @@ public class LambdaCommand extends CommandBase {
     /**
      * The action to take when the command ends.  Called when either the command finishes normally,
      * or when it interrupted/canceled.
+     *
      * @param end end method to set. Should have interrupted (whether the command was
      *            interrupted/canceled) as the parameter.
      * @return this object for chaining purposes
@@ -129,6 +169,7 @@ public class LambdaCommand extends CommandBase {
     /**
      * The action to take when the command ends.  Called when either the command finishes normally,
      * or when it interrupted/canceled.
+     *
      * @param end end method to set. Ignores if command was interrupted
      * @return this object for chaining purposes
      */
@@ -139,6 +180,7 @@ public class LambdaCommand extends CommandBase {
     /**
      * Whether the given command should run when the robot is disabled.  Override to return true
      * if the command should run when disabled.
+     *
      * @param runWhenDisabled runWhenDisabled supplier to set
      * @return this object for chaining purposes
      */
@@ -150,6 +192,7 @@ public class LambdaCommand extends CommandBase {
     /**
      * Whether the given command should run when the robot is disabled.  Override to return true
      * if the command should run when disabled.
+     *
      * @param runWhenDisabled runWhenDisabled boolean to set
      * @return this object for chaining purposes
      */
@@ -158,10 +201,12 @@ public class LambdaCommand extends CommandBase {
     }
 
     /**
-     * Factory method to create a LambdaCommand from a CommandBase.
+     * Factory method to create a LambdaCommand from an existing command.
+     * Useful when you need to change a little bit from the original.
+     *
      * @return a new LambdaCommand instance
      */
-    public static LambdaCommand from(CommandBase command) {
+    public static LambdaCommand from(Command command) {
         return new LambdaCommand(
                 command::initialize,
                 command::execute,

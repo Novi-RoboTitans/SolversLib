@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * <p>
  * Builder style:
  * <pre>
- * CommandBase driveForward = new LambdaCommand()
+ * new LambdaCommand()
  *     .setInitialize(() -> drivetrain.resetEncoders())
  *     .setExecute(() -> drivetrain.pidTo(new Pose(100, 100))
  *     .setIsFinished(() -> drivetrain.getDistance() < 5)
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  * </pre>
  * Functional style:
  * <pre>
- * CommandBase driveForward = new LambdaCommand(
+ * new LambdaCommand(
  *     () -> drivetrain.resetEncoders(),
  *     () -> drivetrain.pidTo(new Pose(100, 100)),
  *     () -> drivetrain.getDistance() < 5,

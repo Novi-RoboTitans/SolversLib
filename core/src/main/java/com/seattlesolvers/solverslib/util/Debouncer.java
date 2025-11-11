@@ -1,5 +1,13 @@
 package com.seattlesolvers.solverslib.util;
 
+/**
+ * A filter to eliminate unwanted quick on/off cycles (termed “bounces”).
+ * These cycles are usually due to a sensor error like noise or reflections
+ * and not the actual event the sensor is trying to record.
+ * More powerful version of WPILib's Debouncer.
+ *
+ * @author Daniel - FTC 7854
+ */
 public class Debouncer {
     /** Type of debouncing to perform. */
     public enum DebounceType {

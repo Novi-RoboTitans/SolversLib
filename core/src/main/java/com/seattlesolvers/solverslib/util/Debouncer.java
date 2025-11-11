@@ -1,7 +1,5 @@
 package com.seattlesolvers.solverslib.util;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 public class Debouncer {
     /** Type of debouncing to perform. */
     public enum DebounceType {
@@ -16,7 +14,7 @@ public class Debouncer {
     private double debounceRising;
     private double debounceFalling;
 
-    private ElapsedTime timer;
+    private long previousTime;
     private boolean state;
     private boolean lastInput;
 
@@ -30,9 +28,7 @@ public class Debouncer {
     public Debouncer(double debounceRising, double debounceFalling, boolean baseline) {
         this.debounceRising = debounceRising;
         this.debounceFalling = debounceFalling;
-        this.timer = new ElapsedTime();
-        this.state = baseline;
-        this.lastInput = baseline;
+        reset(baseline);
     }
 
     /**
@@ -72,16 +68,28 @@ public class Debouncer {
     public boolean calculate(boolean input) {
         if (input != lastInput) {
             lastInput = input;
-            timer.reset();
+            previousTime = System.nanoTime();
         }
 
         double debounce = input ? debounceRising : debounceFalling;
 
         // This will still work before the first input change
-        if (timer.seconds() >= debounce) {
+        if (System.nanoTime() - previousTime >= debounce * 1e6) {
             state = input;
         }
 
         return state;
+    }
+
+    /**
+     * Resets the debouncer to true or false.
+     * Useful if you know for sure something has changed and don't want to wait.
+     *
+     * @param state The new state of the debouncer
+     */
+    public void reset(boolean state) {
+        this.previousTime = 0;
+        this.state = state;
+        this.lastInput = state;
     }
 }

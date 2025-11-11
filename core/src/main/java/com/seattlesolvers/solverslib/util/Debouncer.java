@@ -31,12 +31,12 @@ public class Debouncer {
      *
      * @param debounceRising Debounce time on the rising edge in seconds
      * @param debounceFalling Debounce time on the falling edge in seconds
-     * @param baseline If it is initially rising (true) or falling (false)
+     * @param initial If it is initially true or falling false
      */
-    public Debouncer(double debounceRising, double debounceFalling, boolean baseline) {
+    public Debouncer(double debounceRising, double debounceFalling, boolean initial) {
         this.debounceRising = debounceRising;
         this.debounceFalling = debounceFalling;
-        reset(baseline);
+        reset(initial);
     }
 
     /**

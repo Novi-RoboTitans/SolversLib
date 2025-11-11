@@ -42,7 +42,7 @@ public class Debouncer {
      * {@link DebounceType#Falling} - rising edge: {@code 0}, falling edge: {@code debounce}, initially {@code true}<br>
      * {@link DebounceType#Both} - rising edge: {@code debounce}, falling edge: {@code debounce}, initially {@code false}
      *
-     * @param debounce The debounce time in seconds
+     * @param debounce Debounce time in seconds
      * @param type Rising, falling, or both edges
      */
     public Debouncer(double debounce, DebounceType type) {
@@ -51,6 +51,16 @@ public class Debouncer {
                 type == DebounceType.Rising ? 0 : debounce,
                 type == DebounceType.Falling
         );
+    }
+
+    /**
+     * Creates a rising edge debouncer.
+     * Equivalent to {@code Debouncer(debounceRising, DebounceType.Rising);}
+     *
+     * @param debounceRising Debounce time on the rising edge in seconds
+     */
+    public Debouncer(double debounceRising) {
+        this(debounceRising, 0, false);
     }
 
     /**

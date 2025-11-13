@@ -3,12 +3,12 @@ pluginManagement {
 		gradlePluginPortal()
 		mavenCentral()
 		google()
-		maven("https://repo.dairy.foundation/releases/")
+		// maven("https://repo.dairy.foundation/releases/")
 	}
 }
 
 includeBuild("../core") {
-	dependencySubstitution {
+/*	dependencySubstitution {
 		substitute(module("org.solverslib:core")).using(project(":"))
-	}
+	}*/
 }

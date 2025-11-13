@@ -94,7 +94,7 @@ public class LambdaCommand extends CommandBase {
 
     // Override to return self type
     @Override
-    public LambdaCommand addRequirements(Subsystem... requirements) {
+    public final LambdaCommand addRequirements(Subsystem... requirements) {
         m_requirements.addAll(Arrays.asList(requirements));
         return this;
     }

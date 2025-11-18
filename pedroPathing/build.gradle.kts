@@ -25,8 +25,7 @@ dependencies {
     implementation("com.pedropathing:ftc:2.0.4")
 
     afterEvaluate {
-        // api("org.solverslib:core:${version}")
-        api(project(":core"))
+        api("org.solverslib:core")
     }
 }
 
